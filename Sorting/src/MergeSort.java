@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class MergeSort {
 
     public void MSort(int[] arr, int start, int end){
