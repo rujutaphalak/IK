@@ -37,22 +37,23 @@ public class MergeSort {
 
         int i=0, j=0, k=start;
 
-            while(i<arrayLength1 && j<arrayLength2) {
-                if (array1[i] <= array2[j]) {
-                    arr[k] = array1[i];
-                    k++;
-                    i++;
-                }
-                else {
-                    arr[k] = array2[j];
-                    k++;
-                    j++;
-                }
-            }
-            while(i < arrayLength1){
+        while(i<arrayLength1 && j<arrayLength2) {
+            if (array1[i] <= array2[j]) {
                 arr[k] = array1[i];
-                k++; i++;
+                k++;
+                i++;
             }
+            else {
+                arr[k] = array2[j];
+                k++;
+                j++;
+            }
+        }
+
+        while(i < arrayLength1){
+            arr[k] = array1[i];
+            k++; i++;
+        }
 
         while(j < arrayLength2){
             arr[k] = array2[j];

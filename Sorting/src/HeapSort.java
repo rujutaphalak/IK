@@ -7,9 +7,11 @@ public class HeapSort {
         //Continue heap sorting until we have one element left.
         //lastElement is array.length-1 because we start with 0 here to do max heapify.
         //NOTE: while building maxheap we pass array.length and not array.length-1
-        for(int lastElement=array.length-1; lastElement>=0; lastElement--) {
+        int lastElement=array.length-1;
+        while(lastElement>=0) {
             swap(array,0,lastElement);
             maxHeapify(array,0,lastElement);
+            lastElement--;
         }
     }
 
