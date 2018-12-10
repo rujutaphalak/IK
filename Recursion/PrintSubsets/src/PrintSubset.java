@@ -72,7 +72,7 @@ Sample Output:
 
 import java.util.ArrayList;
 
-class Subset {
+class PrintSubset {
     public static void main(String[] args) {
 
         String str = "ABC";
