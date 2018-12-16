@@ -132,27 +132,22 @@
 
 
 /**
- * solution not yet provided by IK
+ * solution not yet provided by IK. Working on IDE for two cases for which it is failing on IK platform.
  */
 
 public class ZombieCluster {
 
   public static void main(String[] args) {
       String[] str = {"4","1100","1110","0110","0001"};
+//    String[] str = {"5","10000","01000","00100","00010","00001"};
       int clusterCount = zombieCluster(str);
       System.out.println(clusterCount);
   }
 
   static int zombieCluster(String[] zombies) {
-    int rows = Integer.parseInt(zombies[0]);
-    int[][] zombieMatrix = new int[rows][rows];
+    int rows = zombies.length;
 
-    for (int i = 0; i < rows; i++) {
-      char[] arr = zombies[i+1].toCharArray();
-      for (int j = 0; j < rows; j++) {
-        zombieMatrix[i][j] = Character.getNumericValue(arr[j]);
-      }
-    }
+    int[][] zombieMatrix = buildZombieMAtrix(zombies, rows);
 
     boolean[] visited = new boolean[rows];
     boolean[] visiting = new boolean[rows];
@@ -167,6 +162,17 @@ public class ZombieCluster {
         }
       }
     return clusterCount;
+  }
+
+  static int[][] buildZombieMAtrix(String[] zombies, int rows){
+    int[][] zombieMatrix = new int[rows][rows];
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < rows; j++) {
+        zombieMatrix[i][j] = Integer.parseInt(zombies[i].charAt(j)+"");
+
+      }
+    }
+    return zombieMatrix;
   }
 
   static void zombieClusterDfs(int[][] zombieMatrix, boolean[] visited, boolean[] visiting, int i, int cols){
