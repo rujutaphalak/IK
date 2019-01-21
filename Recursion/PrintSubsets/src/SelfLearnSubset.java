@@ -21,7 +21,9 @@ public class SelfLearnSubset {
             list.add(subset);
             return list;
         }
+        //Do not include the new ith element of s in subset.
         generateSubsets(s,i+1,subset,list);
+        //Includethe ith element of s in output subset by doing subset+s.subString(i,i+1)
         generateSubsets(s,i+1,subset+s.substring(i,i+1),list);
         return list;
     }
