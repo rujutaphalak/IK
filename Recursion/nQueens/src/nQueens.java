@@ -469,9 +469,9 @@
  (If you are looking at other solutions online and wondering why they are faster, then pay attention that they are printing only ONE VALID arrangement, not all possible arrangements!)
  */
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 public class nQueens {
 
@@ -483,6 +483,66 @@ public class nQueens {
     }
   }
 
+  //----------------------Directly in to 2D grid ---- not working :(
+//  private static String[][] nQueens(int n) {
+//    char[][] board = new char[n][n];
+//    //Initialize the 2D board with '-'
+//    for (int i = 0; i < board.length; i++) {
+//      for (int j = 0; j < board.length; j++) {
+//        board[i][j] = '-';
+//      }
+//    }
+//
+//    nQueensRec(0, board);
+//    String[][] boardString = new String[board.length][board.length];
+//    for (int i = 0; i < board.length; i++) {
+//      for (int j = 0; j < board.length; j++)
+//        boardString[i][j] = new String(board[i]);
+//    }
+//    return boardString;
+//  }
+//
+//  private static void nQueensRec(int col, char[][] board) {
+//
+//    if(col == board.length){
+//      return;
+//    }
+//
+//    for(int i=col; i<board.length; i++) {
+//      for (int j = 0; j < board.length; j++) {
+//        board[i][j] = 'q';
+//        if (validQueenPosition(board, i, j))
+//          nQueensRec(col + 1, board);
+//
+//        else {
+//          board[i][j] = '-';
+//          return;
+//        }
+//      }
+//    }
+//    return;
+//  }
+//
+//  private static boolean validQueenPosition(char[][] board, int col, int row) {
+//    //if any other queen is diagonal or on the same row, it is invalid
+//    for (int i = 0; i < col; i++) {
+//      for (int j = 0; j < row; j++) {
+//        if(board[i][j] == 'q') {
+//          if (board[col][row] == board[i][j] || (col - i == Math
+//              .abs(board[i][j] - board[col][row])))
+//            return false;
+//        }
+//      }
+//    }
+//    return true;
+//  }
+//}
+//----------------------Directly in to 2D grid ---- not working :(
+
+/**
+ * Working solution submitted to IK
+ */
+  //---------------------------This creates the 1D array and then converts it to 2D array.
   private static String[][] nQueens(int n) {
     int[] board = new int[n];
     List<String[]> result = new ArrayList<>();
@@ -532,9 +592,12 @@ public class nQueens {
     return true;
   }
 }
+//------------------------This creates the 1D array and then converts it to 2D array.
+
+//--------------------------This print the 1D array.
 
 //  private static void nQueens(int n){
-//    board = new int[n];
+//    int[] board = new int[n];
 //    //Initialize the board to -1
 //    for(int i=0; i<n; i++){
 //      board[i] = -1;
@@ -570,3 +633,4 @@ public class nQueens {
 //    return true;
 //  }
 //}
+//-----------------------------This print the 1D array

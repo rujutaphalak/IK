@@ -3,7 +3,7 @@ import java.util.ArrayList;
 public class SelfLearnSubset {
 
     public static void main(String []args){
-        String str = "abc";
+        String str = "ab";
         String[] list=generate_all_subsets(str);
         for(String s:list)
             System.out.println(s);
