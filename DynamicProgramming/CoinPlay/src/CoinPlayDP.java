@@ -9,30 +9,29 @@ public class CoinPlayDP {
 
   public static int maxWin(int[] v){
     int len = v.length;
-    int[][] memo = new int[len][len];
-    for(int i=0;i<memo.length;i++){
-      for(int j=0;j<memo.length;j++) {
-        if (i==j)
-          memo[i][j] = v[i];
-      }
+    int[][] dpTable = new int[len][len];
+    for(int i=0;i<dpTable.length-1;i++){
+          dpTable[i][i] = v[i];
+          dpTable[i][i+1] = Math.max(v[i],v[i+1]);
     }
-    return maxWin(v,0,len-1, memo);
+//    for(int i=0;i<len-1;i++){
+//      dpTable[i][len-1] = 0;
+//    }
+//    for(int i=0;i<len-1;i++){
+//      dpTable[len-1][i] = 0;
+//    }
+    return maxWin(v,dpTable);
   }
 
-  private static int maxWin(int[] v, int first, int last, int[][] memo) {
+  private static int maxWin(int[] v, int[][] dpTable) {
 
-    if(memo[first][last] != 0)
-      return memo[first][last];
-
-    if(first == last)
-      return memo[first][last] = v[first];
-
-    if(last == first + 1)
-      return memo[first][last] = Math.max(v[first], v[last]);
-
-    int opt1 = v[first] + Math.min(maxWin(v,first+2, last, memo),maxWin(v,first+1, last-1, memo));
-    int opt2 = v[last] + Math.min(maxWin(v,first+1, last-1, memo),maxWin(v,first, last-2, memo));
-
-    return memo[first][last]= Math.max(opt1,opt2);
+    for(int row=dpTable.length-1; row>=0;row++){
+      for(int col=dpTable.length-1;col>=0;col++){
+        int opt1 = v[row] + Math.min(dpTable[row+2][col],dpTable[row+1][col-1]);
+        int opt2 = v[col] + Math.min(dpTable[row+1][col-1],dpTable[row][col-2]);
+        dpTable[row][col] = Math.max(opt1,opt2);
+      }
+    }
+    return dpTable[0][0];
   }
 }

@@ -31,6 +31,22 @@ public class MinCoinChangeRecursion {
     }
     return minCoins;
   }
+
+//  private static int coinChange(int amount) {
+//    if (amount == 0)
+//      return 0;
+//
+//    int minCoins = Integer.MAX_VALUE;
+//
+//    for (int i = 0; i < coins.length; i++) {
+//      if(coins[i] <=amount) {
+//        int numCoins = coinChange(amount - coins[i]);
+//        if (numCoins != Integer.MAX_VALUE)
+//          minCoins=Math.min(numCoins+1,minCoins);
+//      }
+//    }
+//    return minCoins;
+//  }
 //  //----------------------GEEKS for GEEKs------------------------//
 
 

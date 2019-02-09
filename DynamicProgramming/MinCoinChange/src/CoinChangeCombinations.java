@@ -1,5 +1,3 @@
-import sun.awt.image.IntegerComponentRaster;
-
 public class CoinChangeCombinations {
   public static void main(String[] args){
     int[] d = {2,3,5};
@@ -11,21 +9,6 @@ public class CoinChangeCombinations {
   public static int combinations(int c, int[] d){
     return combos(c,d);
   }
-//
-//  private static int combos(int c, int[] d,int currentCoin){
-//    //base cases
-//
-//    if(c == 0) return 1;
-//    if(c < 0) return 0;
-//
-//    int count=0;
-//    for(int coin = currentCoin; coin< d.length; coin++){
-//      count+=combos(c-d[coin],d,coin);
-//    }
-//
-//    return count;
-//  }
-
 
   private static int combos(int c, int[] d){
     //base cases
@@ -34,11 +17,9 @@ public class CoinChangeCombinations {
     if(c < 0) return 0;
 
     int count=0;
-    for(int coin = 0; coin< d.length; coin++){
+    for(int coin = 0; coin<d.length; coin++){
       count+=combos(c-d[coin],d);
     }
-
     return count;
   }
-
 }
