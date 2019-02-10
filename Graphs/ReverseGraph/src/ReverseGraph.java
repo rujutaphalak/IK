@@ -104,7 +104,8 @@
  *
  *
  *
- * As we are doing normal DFS time complexity of our solution will be O(V + E). We are given n nodes and also given that it does not contain multiple edges and self loops hence maximum number of edges possible is n * (n - 1). So time complexity will be O(n + n^2) that is O(n^2).
+ * As we are doing normal DFS time complexity of our solution will be O(V + E). We are given n nodes and also given that it does not contain multiple edges
+ * and self loops hence maximum number of edges possible is n * (n - 1) ~ for undirected graph it is n(n-1). So time complexity will be O(n + n^2) that is O(n^2).
  *
  *
  *
@@ -119,12 +120,12 @@ import java.util.*;
 
 public class ReverseGraph {
 
-  static class Node
-  {
+  static class Node {
+
     Integer val;
     Vector<Node> neighbours = new Vector<Node>(0);
-    Node(Integer _val)
-    {
+
+    Node(Integer _val) {
       val = _val;
       neighbours.clear();
     }
@@ -132,31 +133,28 @@ public class ReverseGraph {
 
   /**
    * Working solution
-   * @param node
-   * @return
    */
-  static Node buildOtherGraph(Node node)
-  {
+  static Node buildOtherGraph(Node node) {
     Map<Integer, Node> cloneMap = new HashMap<>();
     return reverseGraph(node, cloneMap);
   }
 
-  private static Node reverseGraph(Node node, Map<Integer, Node> cloneMap){
+  private static Node reverseGraph(Node node, Map<Integer, Node> cloneMap) {
 
     //since this check is not done anywhere else, it needs to be done here
-    if(cloneMap.containsKey(node.val)) {
+    if (cloneMap.containsKey(node.val)) {
       return cloneMap.get(node.val);
     }
 
     //Visit the node
     Node cNode = new Node(node.val);
-    cloneMap.put(cNode.val,cNode);
+    cloneMap.put(cNode.val, cNode);
 
     //Loop through neighbors to create new nodes in the map
     for (Node neighbor : node.neighbours) {
       //with the below containsKeyCheck, the reverse edge mapping is skipped, hence it does not work
       //if(!cloneMap.containsKey(neighbor.val)) {
-      Node neighborNode = reverseGraph(neighbor,cloneMap);
+      Node neighborNode = reverseGraph(neighbor, cloneMap);
 
       //Reverse the edges by using the returned neighbor node instead of this function returning void and then doing the below statement.
       // Node neighborNode = cloneMap.get(neighbor.val);
@@ -169,7 +167,6 @@ public class ReverseGraph {
 
   /**
    * Other way of doing it with void as return instead of node
-   * @param args
    */
   // 	static Node build_other_graph(Node node) {
 
@@ -194,8 +191,7 @@ public class ReverseGraph {
 // 	        neighborNode.neighbours.add(newNode);
 // 	    }
 // 	}
-
-  public static void main(String[] args){
+  public static void main(String[] args) {
     Node node1 = new Node(1);
     Node node2 = new Node(2);
     Node node3 = new Node(3);
@@ -203,7 +199,6 @@ public class ReverseGraph {
     node1.neighbours.add(node2);
     node2.neighbours.add(node3);
     node3.neighbours.add(node1);
-
 
     Node node = buildOtherGraph(node1);
     System.out.println("One node in the new reversed graph is " + node.val);

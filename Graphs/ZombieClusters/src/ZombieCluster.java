@@ -138,54 +138,77 @@
 public class ZombieCluster {
 
   public static void main(String[] args) {
-      String[] str = {"4","1100","1110","0110","0001"};
-//    String[] str = {"5","10000","01000","00100","00010","00001"};
+      String[] str = {"1100","1110","0110","0001"};
+//    String[] str = {"10000","01000","00100","00010","00001"};
       int clusterCount = zombieCluster(str);
       System.out.println(clusterCount);
   }
 
-  static int zombieCluster(String[] zombies) {
+  //------------------Second way of doing it----------------------//
+  public static int zombieCluster(String[] zombies) {
+
+    //Simple DFS. Great solution over second one.
     int rows = zombies.length;
-
-    int[][] zombieMatrix = buildZombieMAtrix(zombies, rows);
-
-    boolean[] visited = new boolean[rows];
-    boolean[] visiting = new boolean[rows];
-    int clusterCount = 0;
-
-    for (int i = 0; i < zombieMatrix.length; i++) {
-        if (!visited[i]) {
-          visiting[i] = true;
-          zombieClusterDfs(zombieMatrix, visited, visiting, i, rows);
-          clusterCount++;
-          visited[i] = true;
-        }
+    int count =0;
+    int[] visited = new int[zombies.length];
+    for(int zombie=0;zombie<rows;zombie++){
+      if(visited[zombie] != 1) {
+        explore(zombies, zombie, visited);
+        count += 1;
       }
-    return clusterCount;
+      }
+    return count;
   }
 
-  static int[][] buildZombieMAtrix(String[] zombies, int rows){
-    int[][] zombieMatrix = new int[rows][rows];
-    for (int i = 0; i < rows; i++) {
-      for (int j = 0; j < rows; j++) {
-        zombieMatrix[i][j] = Integer.parseInt(zombies[i].charAt(j)+"");
-
-      }
-    }
-    return zombieMatrix;
-  }
-
-  static void zombieClusterDfs(int[][] zombieMatrix, boolean[] visited, boolean[] visiting, int i, int cols){
-    if(!visited[i]) {
-      visiting[i] = true;
-
-      for (int j = i+1; j < cols; j++) {
-        if (!visited[j] && zombieMatrix[i][j] == 1) {
-          visiting[j] = true;
-          zombieClusterDfs(zombieMatrix, visited, visiting, j, cols);
-          visited[j] = true;
-        }
+  //Go through neighbors and recursively call it
+  private static void explore(String[] zombies, int index, int[] visited) {
+    visited[index] = 1;
+    for(int neighbor=0;neighbor<zombies.length;neighbor++){
+      if(index != neighbor && zombies[index].charAt(neighbor) == '1' && visited[neighbor] != 1){
+        explore(zombies,neighbor,visited);
       }
     }
   }
+
+  //-------------------------One way of doing it--------------//
+//  public static int zombieCluster(String[] zombies) {
+//    //Build a 2D grid for easier looping
+//    int[][] zombieGrid = buildGrid(zombies);
+//
+//    //Go through each zombie using DFS, not explore yet.
+//    int rows = zombieGrid.length;
+//    int count =0;
+//    for(int i=0;i<rows;i++){
+//      if(zombieGrid[i][i] == 0) continue;
+//      else{
+//        explore(zombieGrid, i);
+//        count+=1;
+//      }
+//    }
+//    return count;
+//  }
+//
+//  private static int[][] buildGrid(String[] zombies){
+//    int rows = zombies.length;
+//    int cols = zombies[0].length();
+//    int[][] zombieGrid = new int[rows][cols];
+//    for(int i =0;i<rows;i++) {
+//      for(int j=0;j<cols;j++){
+//        zombieGrid[i][j] = zombies[i].charAt(j)-'0';
+//      }
+//    }
+//    return zombieGrid;
+//  }
+//
+//  private static void explore(int[][] zombieGrid, int zombie){
+//    zombieGrid[zombie][zombie]=0;
+//    for(int neighbor=0;neighbor<zombieGrid.length;neighbor++){
+//      if(zombieGrid[neighbor][neighbor] == 0)
+//        zombieGrid[zombie][neighbor] = 0;
+//      else if(zombieGrid[zombie][neighbor] == 1){
+//        explore(zombieGrid, neighbor);
+//      }
+//    }
+//  }
+  //-------------------------One way of doing it--------------//
 }
