@@ -260,37 +260,42 @@
 
  Time complexity, auxiliary space used and space complexity of the solution is O(number of rows * number of cols * 2^(number of different keys possible that is 10 in our case)).
  */
+//IK solution sample ink http://oj.interviewkickstart.com/view_top_submission/513/119/21769/
 
 //Not working
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Queue;
+import java.util.Collections;
 
 public class ShortestPathIn2DGrid {
 
-  static int rows, cols;
-  static Cell originCell;
-  static Cell destinationCell;
+  static char[][]  charGrid;
   static int[] rowDirection = {-1, 0, 1, 0};
   static int[] colDirection = {0, -1, 0, 1};
+  static List<int[]> paths = new ArrayList<int[]>();
 
   static class Cell{
     int x;
     int y;
     int dist;
+    int keyRing;
+    Cell parent;
 
-    public Cell(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    Cell(int x, int y, int dist) {
+    public Cell(int x, int y, int dist, int keyRing) {
       this.x = x;
       this.y = y;
       this.dist = dist;
+      this.keyRing = keyRing;
+    }
+
+    public Cell(int x, int y, int dist, int keyRing, Cell parent) {
+      this.x = x;
+      this.y = y;
+      this.dist = dist;
+      this.keyRing = keyRing;
+      this.parent = parent;
     }
 
     int getX() {
@@ -316,96 +321,122 @@ public class ShortestPathIn2DGrid {
     void setDist(int dist) {
       this.dist = dist;
     }
+
+    public int getKeyRing() {
+      return keyRing;
+    }
+
+    public void setKeyRing(int keyRing) {
+      this.keyRing = keyRing;
+    }
+
+    public Cell getParent() {
+      return parent;
+    }
+
+    public void setParent(Cell parent) {
+      this.parent = parent;
+    }
   }
 
-  static int find_shortest_path(String[] grid) {
-    char originChar = '@';
-    char destChar = '+';
-    Set<Character> keys = new HashSet<>();
-    char[][] charGrid = createCharGrid(grid, originChar, destChar, keys);
-    return bfsGridExplore(charGrid, originCell, destinationCell, keys);
+  private static int[][] find_shortest_path(String[] grid){
+    //Created a 2D character grid an also found the coordinates of start cell and stored them in a static variable
+    Cell startCell = createCharGrid(grid);
+    bfsGridExplore(startCell);
+    if (paths.size() == 0) {
+      return new int[0][0];
+    }
+
+    Collections.reverse(paths);
+    return paths.toArray(new int[paths.size()-1][]);
   }
 
-  private static char[][] createCharGrid(String[]grid, char originChar, char destChar, Set<Character> keys){
-      rows = grid.length;
-      cols = grid[0].toCharArray().length;
-      char[][] charGrid = new char[rows][cols];
+  private static Cell createCharGrid(String[] grid){
+      int rows = grid.length;
+      int cols = grid[0].toCharArray().length;
+      Cell startCell = null;
+      charGrid = new char[rows][cols];
 
       for(int i=0; i<rows; i++){
-        char[] row = grid[i].toCharArray();
         for(int j=0; j<cols; j++){
-          charGrid[i][j] = row[j];
-          if(charGrid[i][j] == originChar) {
-            originCell = new Cell(i,j);
-          }
-          else if(charGrid[i][j] == destChar) {
-            destinationCell = new Cell(i,j);
-          }
-          else if(charGrid[i][j] > 'a' && charGrid[i][j] < 'z')
-            keys.add(charGrid[i][j]);
+          charGrid[i][j] = grid[i].charAt(j);
+          if(charGrid[i][j] == '@')
+            startCell = new Cell(i,j,0,0);
         }
       }
-      return charGrid;
+      return startCell;
   }
 
-  static int bfsGridExplore(char[][] charGrid, Cell originCell, Cell destinationCell, Set<Character> keys) {
-    boolean[][] visited = new boolean[charGrid.length][charGrid[0].length];
+  static void bfsGridExplore(Cell startCell) {
+    // this is 0000000000 (10bits to represent a key). Every other 1 bit shift represents the letter a-j
+    boolean visited[][][] = new boolean[charGrid.length][charGrid[0].length][1024];
+
     Queue<Cell> queue = new LinkedList<>();
-    queue.add(originCell);
+    startCell.setDist(0);
+    startCell.setKeyRing(0);
+    queue.add(startCell);
+    visited[startCell.getX()][startCell.getY()][0] = true;
 
     while(!queue.isEmpty()){
-      Cell poppedCell = queue.poll();
-      int x = poppedCell.getX();
-      int y = poppedCell.getY();
+      Cell popped = queue.poll();
+      char poppedChar = charGrid[popped.getX()][popped.getY()];
 
-      if(x==destinationCell.getX() && y==destinationCell.getY())
-        return destinationCell.getDist();
+      //This is Optimization that prevents all distant points from being tried.
+      if(paths.size() != 0 && paths.size() <= popped.getDist()) continue;
+      if( poppedChar == '+'){
+        //do things to check if steep if current path is shorter than the one
+        //return that path.
+        if(paths.size() == 0 || paths.size() > popped.getDist())
+          paths.clear();
+          while (popped != null) {
+          paths.add(new int[]{popped.getX(), popped.getY()});
+          popped = popped.parent;
+        }
+        continue;
+      }
 
-      if(!visited[x][y]){
-        visited[x][y] = true;
-        List<Cell> list = getValidNeighbors(charGrid, x,y, rows, cols, keys);
-        for(Cell neighbor: list){
-          neighbor.setDist(poppedCell.getDist()+1);
+      for(Cell neighbor: getValidNeighbors(popped, charGrid.length, charGrid[0].length, visited)){
+        int neighborRow = neighbor.getX();
+        int neighborCol = neighbor.getY();
+
+        if(!visited[neighbor.getX()][neighbor.getY()][neighbor.getKeyRing()]){
+          visited[neighborRow][neighborCol][neighbor.getKeyRing()] = true;
           queue.add(neighbor);
         }
       }
     }
-    return -1;
   }
 
-  private static List<Cell> getValidNeighbors(char[][] charGrid, int x, int y, int rows, int cols, Set<Character> keys) {
+  private static List<Cell> getValidNeighbors(Cell popped, int rows, int cols, boolean[][][] visited) {
     List<Cell> list = new ArrayList<>();
 
     for (int i = 0; i < rowDirection.length; i++) {
-      int neighborX = x + rowDirection[i];
-      int neighborY = y + colDirection[i];
+      int neighborX = popped.getX() + rowDirection[i];
+      int neighborY = popped.getY() + colDirection[i];
       if(neighborX < 0 || neighborX >= rows || neighborY < 0 || neighborY >= cols)
         continue;
       char neighborChar = charGrid[neighborX][neighborY];
-
-      if (neighborChar != '#') {
-//        if(neighborChar >='A' && neighborChar <= 'Z') {
-//          char key = Character.toUpperCase(neighborChar);
-//          if (!keys.contains(key))
-//            continue;
-//        }
-      if(neighborChar >='a' && neighborChar <= 'j')
-        keys.add(neighborChar);
-
-        Cell neighborCell = new Cell(neighborX, neighborY);
-        list.add(neighborCell);
-        }
+      if (neighborChar == '#') continue;
+      if ('A' <= neighborChar && neighborChar <= 'J'){
+        if((popped.getKeyRing() & (1 << neighborChar - 'A')) == 0)
+          continue;
       }
+      Cell neighborCell = new Cell(neighborX, neighborY, popped.getDist()+1, popped.getKeyRing(), popped);
+
+      if ('a' <= neighborChar && neighborChar <= 'j')
+        neighborCell.setKeyRing(popped.getKeyRing() | (1 << neighborChar - 'a'));
+      list.add(neighborCell);
+    }
     return list;
   }
 
   public static void main(String[] args){
     String[] str = {"...B",
-                    ".b#.",
-                    "@#+."
+        ".b#.",
+        "@#+."
     };
 
-    int shortestSteps = find_shortest_path(str);
+    int[][] shortestSteps = find_shortest_path(str);
     System.out.println(shortestSteps);
   }
 }
