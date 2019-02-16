@@ -166,7 +166,7 @@ public class SnakeLadder {
   }
 
   private static int minNumberOfRollsInternal(int n, int[] moves) {
-    boolean[] visited = new boolean[n+1];
+    boolean[] visited = new boolean[n];
 
     QueueNode startNode = new QueueNode(0,0);
     Queue<QueueNode> queue = new LinkedList<>();
@@ -178,24 +178,23 @@ public class SnakeLadder {
       int index = poppedNode.getIndex();
       int dist = poppedNode.getDist();
 
-      if (!visited[index]) {
-        visited[index] = true;
+      if (index == n-1)
+        return dist;
 
-        if (index == n-1)
-          return dist;
+      //For the neighbors if the rollCount
+      for (int i = 1; i <= 6; i++) {
+        int nextIndex = index + i;
+        if (nextIndex < n && !visited[nextIndex]) {
+          QueueNode neighborNode = new QueueNode();
 
-        //For the neighbors if the rollCount
-        for (int i = 1; i <= 6; i++) {
-          if (index + i < n) {
-            QueueNode neighborNode = new QueueNode();
-            int nextIndex = index + i;
-            if (moves[nextIndex] == -1)
-              neighborNode.setIndex(nextIndex);
-            else
-              neighborNode.setIndex(moves[nextIndex]);
-            neighborNode.setDist(dist+1);
-            queue.add(neighborNode);
-          }
+          if (moves[nextIndex] == -1)
+            neighborNode.setIndex(nextIndex);
+          else
+            neighborNode.setIndex(moves[nextIndex]);
+          neighborNode.setDist(dist+1);
+
+          visited[neighborNode.index] = true;
+          queue.add(neighborNode);
         }
       }
     }

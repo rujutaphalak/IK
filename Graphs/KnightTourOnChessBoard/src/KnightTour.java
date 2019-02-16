@@ -135,6 +135,101 @@ import java.util.*;
 
 public class KnightTour {
 
+//  static class QueueNode{
+//    int x;
+//    int y;
+//    int dist;
+//
+//    public QueueNode(int x, int y) {
+//      this.x = x;
+//      this.y = y;
+//    }
+//
+//    QueueNode(int x, int y, int dist) {
+//      this.x = x;
+//      this.y = y;
+//      this.dist = dist;
+//    }
+//
+//    int getX() {
+//      return x;
+//    }
+//
+//    void setX(int x) {
+//      this.x = x;
+//    }
+//
+//     int getY() {
+//      return y;
+//    }
+//
+//    void setY(int y) {
+//      this.y = y;
+//    }
+//
+//    int getDist() {
+//      return dist;
+//    }
+//
+//    void setDist(int dist) {
+//      this.dist = dist;
+//    }
+//  }
+//
+//  private static int find_minimum_number_of_moves(int rows, int cols, int start_row, int start_col, int end_row, int end_col) {
+//    int row[] = {2, 2, -2, -2, 1, 1, -1, -1};
+//    int col[] = {-1, 1, 1, -1, 2, -2, 2, -2};
+//
+//    Queue<QueueNode> queue = new LinkedList<>();
+//    boolean[][] visited = new boolean[rows][cols];
+//
+//    queue.add(new QueueNode(start_row, start_col, 0));
+//
+//    while (!queue.isEmpty()) {
+//      QueueNode qNode = queue.poll();
+//      int x = qNode.getX();
+//      int y = qNode.getY();
+//
+//      //if the node in the queue has the target co-ordinates return the dist value from the node which is the max distance
+//      if (x == end_row && y == end_col)
+//        return qNode.getDist();
+//
+//      if (!visited[x][y]) {
+//        visited[x][y] = true;
+//        for (int i = 0; i < 8; i++) {
+//
+//          List<QueueNode> neighbors = getNeighbors(x, y, rows, cols, row,
+//              col);
+//          for (QueueNode node : neighbors) {
+//            int qX = node.getX();
+//            int qY = node.getY();
+//            boolean validNeighbor = isValidNeighbor(qX, qY, rows, cols);
+//            if (validNeighbor)
+//              queue.add(new QueueNode(qX, qY, qNode.getDist() + 1));
+//          }
+//        }
+//      }
+//    }
+//    return -1;
+//  }
+//
+//  private static List<QueueNode> getNeighbors(int x, int y, int rows, int cols, int[] row, int[] col) {
+//    List<QueueNode> list = new ArrayList<>();
+//    for(int i=0; i < row.length; i++){
+//      int neighborX = x + row[i];
+//      int neighborY = y + col[i];
+//      list.add(new QueueNode(neighborX,neighborY));
+//    }
+//    return list;
+//  }
+//
+//  private static boolean isValidNeighbor(int nX, int nY, int rows, int cols){
+//    if(nX >= 0 && nX < rows && nY >= 0 && nY < cols)
+//      return true;
+//    else
+//      return false;
+//  }
+
   static class QueueNode{
     int x;
     int y;
@@ -159,7 +254,7 @@ public class KnightTour {
       this.x = x;
     }
 
-     int getY() {
+    int getY() {
       return y;
     }
 
@@ -194,19 +289,13 @@ public class KnightTour {
       if (x == end_row && y == end_col)
         return qNode.getDist();
 
-      if (!visited[x][y]) {
-        visited[x][y] = true;
-        for (int i = 0; i < 8; i++) {
-
-          List<QueueNode> neighbors = getNeighbors(x, y, rows, cols, row,
-              col);
-          for (QueueNode node : neighbors) {
-            int qX = node.getX();
-            int qY = node.getY();
-            boolean validNeighbor = isValidNeighbor(qX, qY, rows, cols);
-            if (validNeighbor)
-              queue.add(new QueueNode(qX, qY, qNode.getDist() + 1));
-          }
+      for(QueueNode neighbor : getNeighbors(x, y, rows, cols, row, col)) {
+        int qX = neighbor.getX();
+        int qY = neighbor.getY();
+        boolean validNeighbor = isValidNeighbor(qX, qY, rows, cols);
+        if(validNeighbor && !visited[qX][qY]){
+          visited[qX][qY] = true;
+          queue.add(new QueueNode(qX, qY, qNode.getDist() + 1));
         }
       }
     }
@@ -229,6 +318,7 @@ public class KnightTour {
     else
       return false;
   }
+
 
   public static void main(String[] args)
   {

@@ -141,6 +141,7 @@ public class WordLadder {
 
             if (!isFirst && word.equals(stop)) {
                 String parent = backRefs.get(stop);
+                //It works fine even with commenting the below step. Not sure why we need this.
                 backRefs.remove(word);
                 return deriveResultList(backRefs, parent, stop);
             }

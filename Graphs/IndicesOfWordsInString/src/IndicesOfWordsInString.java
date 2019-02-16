@@ -271,8 +271,91 @@
 
 import java.util.*;
 public class IndicesOfWordsInString {
+//
+//  static class TrieNode{
+//    private char data;
+//    private HashMap<Character, TrieNode> children;
+//    private ArrayList<Integer> indexes;
+//
+//    public TrieNode() {
+//      this.children = new HashMap<>();
+//      this.indexes = new ArrayList<>();
+//    }
+//
+//    public char getData() {
+//      return data;
+//    }
+//
+//    public void setData(char data) {
+//      this.data = data;
+//    }
+//
+//    public HashMap<Character, TrieNode> getChildren() {
+//      return children;
+//    }
+//
+//    public void setChildren(HashMap<Character, TrieNode> children) {
+//      this.children = children;
+//    }
+//
+//    public ArrayList<Integer> getIndexes() {
+//      return indexes;
+//    }
+//
+//    public void setIndexes(ArrayList<Integer> indexes) {
+//      this.indexes = indexes;
+//    }
+//  }
+//
+//  public static ArrayList<ArrayList<Integer>> find_words(String text, List<String> words) {
+//    TrieNode root = new TrieNode();
+//    String[] splitText = text.split(" ");
+//    int nextIndex = 0;
+//    for(int i=0; i<splitText.length; i++){
+//      insertInTrie(splitText[i], nextIndex, root);
+//      nextIndex+= splitText[i].length()+1;
+//    }
+//
+//    ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+//    for(int i=0; i<words.size(); i++) {
+//      ArrayList<Integer> indexes = searchTrie(words.get(i), root);
+//      if (indexes.size() == 0)
+//        indexes.add(-1);
+//      result.add(indexes);
+//    }
+//    return result;
+//  }
+//
+//  private static void insertInTrie(String text, int index, TrieNode root){
+//    for(char ch: text.toCharArray()){
+//      if(root.children.containsKey(ch)){
+//        root = root.getChildren().get(ch);
+//      }
+//      else {
+//        TrieNode child = new TrieNode();
+//        child.setData(ch);
+//        root.getChildren().put(ch, child);
+//        root = child;
+//      }
+//    }
+//    root.getIndexes().add(index);
+//  }
+//
+//  private static ArrayList<Integer> searchTrie(String word, TrieNode root) {
+//
+//    for(char c: word.toCharArray()){
+//      if(root.getChildren().containsKey(c)){
+//        root = root.getChildren().get(c);
+//      }
+//      else{
+//        return new ArrayList<>();
+//      }
+//    }
+//    return root.getIndexes();
+//  }
 
-  static class TrieNode{
+  static class TrieNode {
+
     private char data;
     private HashMap<Character, TrieNode> children;
     private ArrayList<Integer> indexes;
@@ -307,43 +390,36 @@ public class IndicesOfWordsInString {
     }
   }
 
-  public static ArrayList<ArrayList<Integer>> find_words(String text, List<String> words) {
+  public static ArrayList<ArrayList<Integer>> find_words(String text, List<String> words){
     TrieNode root = new TrieNode();
-    String[] splitText = text.split(" ");
-    int nextIndex = 0;
-    for(int i=0; i<splitText.length; i++){
-      insertInTrie(splitText[i], nextIndex, root);
-      nextIndex+= splitText[i].length()+1;
-    }
-
     ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-    for(int i=0; i<words.size(); i++) {
-      ArrayList<Integer> indexes = searchTrie(words.get(i), root);
-      if (indexes.size() == 0)
-        indexes.add(-1);
-      result.add(indexes);
+    int index = 0;
+
+    //build trie from entire string text.
+    // In one attempt I tried to create the buildtrie by passing in all text and root at once But in that case, the root was losing track of its reference
+    //For every new word the word look up should start from the root.  Thsat was not happening. Lesson learnt for trie inserts and search, the root should always be
+    // initialized before to insert and search function. They should also accept a string which is a whole word not a string of words.
+    String[] sArr = text.split(" ");
+    for (String str : sArr) {
+      buildTrie(str, root, index);
+      index+=str.length()+1;
     }
-    return result;
+
+    //search for words in trie
+    for(String word :words) {
+      ArrayList<Integer> list = searchInTrie(word, root);
+      if (list.size() == 0)
+        list.add(-1);
+      result.add(list);
+    }
+
+    return  result;
   }
 
-  private static void insertInTrie(String text, int index, TrieNode root){
-    for(char ch: text.toCharArray()){
-      if(root.children.containsKey(ch)){
-        root = root.getChildren().get(ch);
-      }
-      else {
-        TrieNode child = new TrieNode();
-        child.setData(ch);
-        root.getChildren().put(ch, child);
-        root = child;
-      }
-    }
-    root.getIndexes().add(index);
-  }
-
-  private static ArrayList<Integer> searchTrie(String word, TrieNode root) {
-
-    for(char c: word.toCharArray()){
+  private static ArrayList<Integer> searchInTrie(String word, TrieNode root) {
+    ArrayList<Integer> list;
+    char[] cArr = word.toCharArray();
+    for(char c: cArr){
       if(root.getChildren().containsKey(c)){
         root = root.getChildren().get(c);
       }
@@ -352,6 +428,23 @@ public class IndicesOfWordsInString {
       }
     }
     return root.getIndexes();
+  }
+
+  private static void buildTrie(String str, TrieNode root, int index) {
+    char[] cArr = str.toCharArray();
+        for(char ch : cArr){
+          if(root.children.containsKey(ch))
+            root = root.children.get(ch);
+          else {
+            TrieNode child = new TrieNode();
+            child.setData(ch);
+            root.getChildren().put(ch, child);
+            root = child;
+          }
+        }
+        ArrayList<Integer> indexes = root.getIndexes();
+        indexes.add(index);
+        root.setIndexes(indexes);
   }
 
   public static void main(String[] args){
