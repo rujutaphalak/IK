@@ -224,7 +224,8 @@ import java.util.stream.Collectors;
 public class MinInRotatedSortedArray {
 
   public static void main(String[] args) {
-    int[] arr = new int[]{6,5,4,3,2};
+//    int[] arr = new int[]{3,2,6,5,4};
+    int[] arr = new int[]{4,5,6,2,3};
     int min = find_minimum(Arrays.stream(arr).boxed().collect(Collectors.toList()));
     System.out.println(min);
   }
@@ -256,8 +257,8 @@ public class MinInRotatedSortedArray {
       return findMinimumDescending(arr);
   }
 
-
-  private static int findMinimumAscending(List<Integer> arr) {
+  //Try this with {4,5,6,2,3};
+ private static int findMinimumAscending(List<Integer> arr) {
     int start = 0, end = arr.size() - 1;
     while (start <= end) {
       if (arr.get(start) <= arr.get(end)) {
@@ -266,7 +267,7 @@ public class MinInRotatedSortedArray {
       int mid = start + (end - start) / 2;
       //Why is this >=
       if (arr.get(mid) >= arr.get(start))
-        //Why is stat=mid+1? why not start=mid
+        //Why is start=mid+1? why not start=mid
         start = mid + 1;
       else
         end = mid;
@@ -274,10 +275,11 @@ public class MinInRotatedSortedArray {
     return -1;
   }
 
+  //Try this {3,2,6,5,4}.
   private static int findMinimumDescending(List<Integer> arr) {
     int start = 0, end = arr.size() - 1;
     while (start <= end) {
-      if (arr.get(start) >= arr.get(end)) {
+      if (arr.get(start) == arr.get(end)) {
         return arr.get(end);
       }
       int mid = start + (end - start) / 2;
@@ -289,4 +291,17 @@ public class MinInRotatedSortedArray {
     }
     return -1;
   }
+  //Because in above code stopping condition is start==end. we can also write the code as below
+//  private static int findMinimumDescending(List<Integer> arr) {
+//    int start = 0, end = arr.size() - 1;
+//    while (start < end) {
+//      int mid = start + (end - start) / 2;
+//      //Why is this > and >= like above
+//      if (arr.get(start) > arr.get(mid))
+//        start = mid;
+//      else
+//        end = mid;
+//    }
+//    return arr.get(start);
+//  }
 }
