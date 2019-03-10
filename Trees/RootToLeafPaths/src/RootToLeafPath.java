@@ -4,31 +4,53 @@ import java.util.List;
 public class RootToLeafPath {
 
 
+//    static void printAllPaths(Node root) {
+//        int[] path = new int[1000];
+//        printAllPathsRec(root,path,0);
+//    }
+//
+//    private static void printAllPathsRec(Node root, int[] path, int pathLen) {
+//
+//        if(root==null)
+//            return;
+//
+//        path[pathLen] = root.val;
+//        pathLen++;
+//
+//        if (root.left == null && root.right == null) {
+//            for(int i=0;i<pathLen;i++){
+//                if(i==pathLen-1)
+//                    System.out.print(path[i]+ "\n");
+//                else
+//                    System.out.print(path[i] + " ");
+//            }
+//        }
+//        else{
+//            printAllPathsRec(root.left,path,pathLen);
+//            printAllPathsRec(root.right,path,pathLen);
+//        }
+//    }
+
     static void printAllPaths(Node root) {
-        int[] path = new int[1000];
-        printAllPathsRec(root,path,0);
+        StringBuilder sb = new StringBuilder();
+        printAllPathsRec(root,sb,0);
     }
 
-    private static void printAllPathsRec(Node root, int[] path, int pathLen) {
+    private static void printAllPathsRec(Node root, StringBuilder sb, int pathLen) {
 
         if(root==null)
             return;
 
-        path[pathLen] = root.val;
-        pathLen++;
+        sb.append(root.val).append(" ");
 
         if (root.left == null && root.right == null) {
-            for(int i=0;i<pathLen;i++){
-                if(i==pathLen-1)
-                    System.out.print(path[i]+ "\n");
-                else
-                    System.out.print(path[i] + " ");
-            }
+            System.out.println(sb.toString());
         }
         else{
-            printAllPathsRec(root.left,path,pathLen);
-            printAllPathsRec(root.right,path,pathLen);
+            printAllPathsRec(root.left,sb,sb.length());
+            printAllPathsRec(root.right,sb,sb.length());
         }
+        sb.delete(pathLen, sb.length());
     }
 
     class Node {

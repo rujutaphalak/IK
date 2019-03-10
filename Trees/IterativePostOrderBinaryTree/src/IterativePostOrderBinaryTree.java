@@ -82,6 +82,39 @@ public class IterativePostOrderBinaryTree {
         }
     }
 
+    //Using one stack times out
+//    static void postorderTraversal(TreeNode root){
+//        if(root==null)
+//            return;
+//        Stack<TreeNode> s = new Stack<>();
+//        s.push(root);
+//        List<Integer> data = new ArrayList<>();
+//
+//        while(!s.isEmpty()){
+//            TreeNode top = s.peek();
+//            if(top.left_ptr == null && top.right_ptr == null){
+//                TreeNode current = s.pop();
+//                data.add(current.val);
+//            }
+//            else{
+//                if(top.right_ptr != null){
+//                    s.push(top.right_ptr);
+//                }
+//                if(top.left_ptr != null){
+//                    s.push(top.left_ptr);
+//                }
+//            }
+//
+//        }
+//
+//        int size = data.size();
+//        for(int i = 0; i<size; i++){
+//            if (i==size-1)
+//                System.out.print(data.get(i));
+//            else
+//                System.out.print(data.get(i) + " ");
+//        }
+//    }
 
     private static Node createBinaryTree() {
         IterativePostOrderBinaryTree bt = new IterativePostOrderBinaryTree();
