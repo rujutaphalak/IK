@@ -316,21 +316,63 @@ public class ArrayProduct {
 
   public static void main(String[] args)
   {
-    int arr[] = {1,2,3,4,5};
+    int arr[] = {1000000000,1000000000};
     int[] result = arrayProduct(arr);
     for(int i:result)
       System.out.println(i);
   }
 
-  private static int[] arrayProduct(int[] arr) {
-    int product =1;
-    int[] result = new int[arr.length];
-    for(int element:arr)
-      product*=element;
+  static int mod = (int)Math.pow(10, 9) + 7;
+  static int[] arrayProduct(int[] nums) {
 
-    for(int i=0;i<arr.length;i++){
-      result[i] = (product/arr [i])%(10^9 + 7);
+    // Size of output array is same as that of input array
+    int[] products = new int[nums.length];
+
+    // For finding value of products[i], product of all nums elements
+    // other than ith element is nothing but
+    // (product of all nums[j], 0<=j<=(i-1)) * (product of all nums[j], (i+1)<=j<=(nums.length-1))
+    // i.e. (nums[0]*nums[1]*...*nums[i-1]) * (nums[i+1]*nums[i+2]*...*nums[nums.length-1])
+
+    int leftProduct = 1;
+
+    // Filling products, such that products[i] contains
+    // product of all elements nums[j], 0<=j<=(i-1)
+    for (int currentIndex = 0; currentIndex < nums.length; currentIndex++) {
+      // Here, leftProduct contains product of all elements
+      // nums[j], 0<=j<=(currentIndex-1)
+      products[currentIndex] = leftProduct;
+
+      // After this updation of leftProduct, leftProduct contains product of all
+      // elements nums[j], 0<=j<=currentIndex
+      nums[currentIndex] = nums[currentIndex]>0?nums[currentIndex]:(mod+nums[currentIndex])%mod;
+      leftProduct = (int)((leftProduct * 1l * nums[currentIndex])%mod);
     }
-    return result;
+
+    int rightProduct = 1;
+
+    // Updating products, such that products[i] contains new value
+    // ((products[i]) * (product of all elements nums[j], 0<=j<=(i-1)))
+    for (int currentIndex = nums.length - 1; currentIndex >= 0; currentIndex--) {
+      // Here, rightProduct contains product of all elements
+      // nums[j], (currentIndex+1)<=j<=(nums.length-1)
+      products[currentIndex] = (int)((products[currentIndex] * 1l * rightProduct)%mod);
+
+      // after this updation of rightProduct, rightProduct contains product of all
+      // elements nums[j], currentIndex<=j<=(nums.length-1)
+      rightProduct = (int)((rightProduct * 1l * nums[currentIndex])%mod);
+    }
+    return products;
   }
+
+//  private static int[] arrayProduct(int[] arr) {
+//    int product =1;
+//    int[] result = new int[arr.length];
+//    for(int element:arr)
+//      product*=element;
+//
+//    for(int i=0;i<arr.length;i++){
+//      result[i] = (product/arr [i])%(10^9 + 7);
+//    }
+//    return result;
+//  }
 }
