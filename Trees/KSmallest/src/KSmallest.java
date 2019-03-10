@@ -284,6 +284,7 @@ public class KSmallest {
   // }
 
 
+  //Why do I have to do leftNode!=null?return leftNode:rightNode
   static int kth_smallest_element(TreeNode root, int k) {
     int[] count = new int[1];
     TreeNode node = helper(root,k,count);
@@ -294,14 +295,24 @@ public class KSmallest {
       return null;
 
     TreeNode leftNode = helper(root.left_ptr, k, count);
+    //Answer will always come from leftNode because we explore leftNode first. Also to stop exploring the right subtree when leftNode is already found, we return the leftNode as soon as we find it.
+    if(leftNode!=null)
+      return leftNode;
     count[0]++;
     if(k == count[0]){
       return root;
     }
     TreeNode rightNode = helper(root.right_ptr, k, count);
+    return rightNode;
+    //Returning root does  not work because consider a tree like 2->root, 1 is left child, 13 is right child, 6 is left child of 13.
+    // Right child is a big subtree. In this case k=3, we should return 6 which is the leftNode for 13.
+    // This code will then still execute the count[0]++ and check if k==count[0], and go on to the right of 13 (whiich could ebe big subtree).
+    // In that case, it execute the right tree and it will not find anything on the rightNode whose value will be null.
+    // In that case, at the level of 13, I have to return leftNode=6 or rightNode =13, not the root 13, and in the ancestor 2 (WRONG).
+    // Also, we do not want to explore the right Node once we find the element which will always be a lefNode value since we explore that first.
+    // To stop exploring the remaining parts of the tree, we can jsut say if(leftNode!=null) return leftNode and in the end return statement just return the rightNode.
 
-    return (leftNode!=null)?leftNode:rightNode;
-    // return null;
+    // return (leftNode!=null)?leftNode:rightNode;
 
   }
 

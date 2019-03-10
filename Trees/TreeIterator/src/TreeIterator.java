@@ -128,19 +128,21 @@ public class TreeIterator {
       return current.val;
     }
   }
-  private static class TreeNode{
+  private static class TreeNode {
+
     public int val;
     public TreeNode left_ptr;
     public TreeNode right_ptr;
 
-    public TreeNode(){
+    public TreeNode() {
       this.left_ptr = null;
       this.right_ptr = null;
     }
 
-    public TreeNode(int val){
+    public TreeNode(int val) {
       this.val = val;
       this.left_ptr = null;
       this.right_ptr = null;
     }
+  }
 }

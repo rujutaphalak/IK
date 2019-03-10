@@ -135,35 +135,60 @@ public class ReverseGraph {
    * Working solution
    */
   static Node buildOtherGraph(Node node) {
-    Map<Integer, Node> cloneMap = new HashMap<>();
+    Map<Node, Node> cloneMap = new HashMap<>();
     return reverseGraph(node, cloneMap);
   }
 
-  private static Node reverseGraph(Node node, Map<Integer, Node> cloneMap) {
+  private static Node reverseGraph(Node node, Map<Node,Node> map){
 
-    //since this check is not done anywhere else, it needs to be done here
-    if (cloneMap.containsKey(node.val)) {
-      return cloneMap.get(node.val);
-    }
-
+    //this is done because, if a node was already cloned, you still want the cloned node (location), so you can use it to be pointed by the neighbor node in the reverse graph or to point to the neighbor in cloned graph.
+    if(map.containsKey(node))
+      return map.get(node);
     //Visit the node
     Node cNode = new Node(node.val);
-    cloneMap.put(cNode.val, cNode);
+    map.put(node,cNode);
 
     //Loop through neighbors to create new nodes in the map
-    for (Node neighbor : node.neighbours) {
-      //with the below containsKeyCheck, the reverse edge mapping is skipped, hence it does not work
-      //if(!cloneMap.containsKey(neighbor.val)) {
-      Node neighborNode = reverseGraph(neighbor, cloneMap);
-
-      //Reverse the edges by using the returned neighbor node instead of this function returning void and then doing the below statement.
-      // Node neighborNode = cloneMap.get(neighbor.val);
+    for(Node neighbor:node.neighbours){
+      //checking if the map does not contain the neigbor node and not calling the reverse graph will cause a problem, as in that case, we will never be able to get the actual cloned node from the map if that is a neighbor and so we can't make the edge. The edge is skipped. This has to be done right before cloning a node. That is return if it already exists otherwise create a clone.
+      Node neighborNode = reverseGraph(neighbor, map);
+      //Reverse the edge. If this was clone a graph then it would exactly the reverse, cNode.neighbours.add(neighborNode)
       neighborNode.neighbours.add(cNode);
-      //}//end if
     }
-
     return cNode;
+
   }
+
+//  static Node buildOtherGraph(Node node) {
+//    Map<Integer, Node> cloneMap = new HashMap<>();
+//    return reverseGraph(node, cloneMap);
+//  }
+
+//  private static Node reverseGraph(Node node, Map<Integer, Node> cloneMap) {
+//
+//    //since this check is not done anywhere else, it needs to be done here
+//    if (cloneMap.containsKey(node.val)) {
+//      return cloneMap.get(node.val);
+//    }
+//
+//    //Visit the node
+//    Node cNode = new Node(node.val);
+//    cloneMap.put(cNode.val, cNode);
+//
+//    //Loop through neighbors to create new nodes in the map
+//    for (Node neighbor : node.neighbours) {
+//      //with the below containsKeyCheck, the reverse edge mapping is skipped, hence it does not work
+//      //if(!cloneMap.containsKey(neighbor.val)) {
+//      Node neighborNode = reverseGraph(neighbor, cloneMap);
+//
+//      //Reverse the edges by using the returned neighbor node instead of this function returning void and then doing the below statement.
+//      // Node neighborNode = cloneMap.get(neighbor.val);
+//      neighborNode.neighbours.add(cNode);
+//      //}//end if
+//    }
+//
+//    return cNode;
+//  }
 
   /**
    * Other way of doing it with void as return instead of node
