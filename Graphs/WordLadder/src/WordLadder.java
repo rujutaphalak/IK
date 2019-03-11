@@ -63,33 +63,146 @@ import java.util.*;
 
 public class WordLadder {
 
-    //-----Working solution Attempt 3+ --------//
+    //-----Working solution Attempt 3+ --------
+    // This works perfectly fall all test cases. One test case fails if
+    // I remove the part where we do the first check instead, just check if word.equal(stop) and change derive list to only pass stop.
+//    static String[] string_transformation(String[] words, String start, String stop) {
+//        if (start.equals(stop) && words.length < 1)
+//            return new String[]{"-1"};
+//
+//        //Create a set of words from the string array and add the start and stop
+//        Set<String> wordSet = new HashSet<>();
+//
+//        wordSet.addAll(Arrays.asList(words));
+//        wordSet.add(start);
+//        wordSet.add(stop);
+//
+//        //BFS - to find the shortest path using wordGraph, start and stop
+//        String[] path = getShortestPath(wordSet, start, stop);
+//        return path;
+//    }
+//
+//    static LinkedList<String> getNeighbors(Set<String> wordSet, String word,
+//        boolean charOperation) {
+//        LinkedList<String> neighbors = new LinkedList<>();
+//
+//        if (charOperation) {
+//            for (int i = 0; i < word.length(); i++) {
+//                for (char c = 'a'; c <= 'z'; c++) {
+//                    String str = null;
+//                    if (word.charAt(i) != c) {
+//                        str = word.substring(0, i) + String.valueOf(c) + word.substring(i + 1);
+//                        if (wordSet.contains(str))
+//                            neighbors.add(str);
+//                    }
+//                }
+//            }
+//        } else {
+//            for (String potentialWord : wordSet)
+//                if (!word.equals(potentialWord))
+//                    if (isCharDifferenceOne(word, potentialWord))
+//                        neighbors.add(potentialWord);
+//        }
+//        return neighbors;
+//    }
+//
+//    static boolean isCharDifferenceOne(String word, String potentialWord) {
+//        int len1 = word.length();
+//        if (len1 != potentialWord.length())
+//            return false;
+//        if (word.equals(potentialWord))
+//            return false;
+//        int count = 0;
+//        for (int i = 0; i < len1; i++) {
+//            if (word.charAt(i) != potentialWord.charAt(i)) {
+//                count += 1;
+//                if (count > 1)
+//                    return false;
+//            }
+//        }
+//        return true;
+//    }
+//
+//    static String[] getShortestPath(Set<String> wordSet, String start, String stop) {
+//        Queue<String> queue = new LinkedList<>();
+//        Map<String, String> backRefs = new HashMap();
+//
+//        queue.add(start);
+//        backRefs.put(start, null);
+//        boolean found = false;
+//
+//        int size = wordSet.size();
+//        int wordLength = start.length();
+//        int wordSetComparisons = (size - 1) * wordLength;
+//        int wordCharOperations = wordLength * 26;
+//        boolean charOperation = (wordCharOperations < wordSetComparisons) ? true : false;
+//        boolean isFirst = true;
+//
+//        while (!queue.isEmpty()) {
+//            String word = queue.remove();
+//
+//            if (!isFirst && word.equals(stop)) {
+//                String parent = backRefs.get(stop);
+//                //It works fine even with commenting the below step. Not sure why we need this.
+//                backRefs.remove(word);
+//                return deriveResultList(backRefs, parent, stop);
+//            }
+//            if(isCharDifferenceOne(word,stop)){
+//                return deriveResultList(backRefs, word, stop);
+//            }
+//
+//            for (String neighbor : getNeighbors(wordSet, word, charOperation)) {
+//
+//                if (!backRefs.containsKey(neighbor)) {
+//                    backRefs.put(neighbor, word);
+//                    queue.add(neighbor);
+//                }
+//            }
+//            isFirst = false;
+//        }
+//        return new String[] { "-1" };
+//    }
+//
+//    static String[] deriveResultList(Map<String, String> parentMap, String current, String stop) {
+//        List<String> resultList = new ArrayList<>();
+//        resultList.add(stop);
+//        resultList.add(current);
+//        String parent = parentMap.get(current);
+//        while (parent != null) {
+//            resultList.add(parent);
+//            parent = parentMap.get(parent);
+//        }
+//        Collections.reverse(resultList);
+//        return resultList.toArray(new String[resultList.size()]);
+//    }
+
+//No working. Attempting 4th try and making changes to see what things I would like to change. Commented part is being changed.
     static String[] string_transformation(String[] words, String start, String stop) {
         if (start.equals(stop) && words.length < 1)
             return new String[]{"-1"};
 
-        //Create a set of words from the string array and add the start and stop
         Set<String> wordSet = new HashSet<>();
 
         wordSet.addAll(Arrays.asList(words));
         wordSet.add(start);
         wordSet.add(stop);
 
-        //BFS - to find the shortest path using wordGraph, start and stop
         String[] path = getShortestPath(wordSet, start, stop);
         return path;
     }
 
-    static LinkedList<String> getNeighbors(Set<String> wordSet, String word,
+    static List<String> getNeighbors(Set<String> wordSet, String word,
         boolean charOperation) {
-        LinkedList<String> neighbors = new LinkedList<>();
+        List<String> neighbors = new ArrayList<>();
 
+        //Using arr instead of string concatenation using substring isn't working. Why?
         if (charOperation) {
             for (int i = 0; i < word.length(); i++) {
+                char[] arr = word.toCharArray();
                 for (char c = 'a'; c <= 'z'; c++) {
-                    String str = null;
                     if (word.charAt(i) != c) {
-                        str = word.substring(0, i) + String.valueOf(c) + word.substring(i + 1);
+                        arr[i] = c;
+                        String str = arr.toString();
                         if (wordSet.contains(str))
                             neighbors.add(str);
                     }
@@ -130,10 +243,8 @@ public class WordLadder {
         boolean found = false;
 
         int size = wordSet.size();
-        int wordLength = start.length();
-        int wordSetComparisons = (size - 1) * wordLength;
-        int wordCharOperations = wordLength * 26;
-        boolean charOperation = (wordCharOperations < wordSetComparisons) ? true : false;
+        boolean charOperation = (size > 26) ? true : false;
+
         boolean isFirst = true;
 
         while (!queue.isEmpty()) {
@@ -141,10 +252,11 @@ public class WordLadder {
 
             if (!isFirst && word.equals(stop)) {
                 String parent = backRefs.get(stop);
-                //It works fine even with commenting the below step. Not sure why we need this.
-                backRefs.remove(word);
+                //Why is the below stepo needed? Does not seem like it really does anything.
+                // backRefs.remove(word);
                 return deriveResultList(backRefs, parent, stop);
             }
+
             if(isCharDifferenceOne(word,stop)){
                 return deriveResultList(backRefs, word, stop);
             }
@@ -173,6 +285,7 @@ public class WordLadder {
         Collections.reverse(resultList);
         return resultList.toArray(new String[resultList.size()]);
     }
+
 
     //---------------Non working 1st attempt solution. Fails 2 test cases where start and stop are exactly same-----------------//
 
@@ -260,7 +373,7 @@ public class WordLadder {
 //                    backRefs.put(neighbor, word);
 //                }
 //
-//                //This should be done immediately after popping not while addig neighbor to queue.
+//                //This should be done immediately after popping not while adding neighbor to queue.
 //                if (neighbor.equals(stop)){
 //                    found = true;
 //                    break;
@@ -285,9 +398,12 @@ public class WordLadder {
 //    }
 
     public static void main(String[] args){
-        String[] words = new String[]{"cccw", "accc", "accw"};
-        String start = "cccc";
-        String stop = "cccc";
+//        String[] words = new String[]{"cccw", "accc", "accw"};
+        String[] words = new String[]{"cat", "hat", "bad", "had"};
+//        String start = "cccc";
+//        String stop = "cccc";
+        String start = "bat";
+        String stop = "had";
         String[] path = string_transformation(words,start,stop);
         for(String p:path)
             System.out.println(p);

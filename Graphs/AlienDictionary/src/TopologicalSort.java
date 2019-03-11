@@ -252,6 +252,8 @@ public class TopologicalSort {
             graphMap.put(cPrev, neighborSet);
             inDegreeMap.put(cNext, inDegreeMap.get(cNext) + 1);
           }
+          //This is so that the moment we hit difference in characters, we have found one dependency adn then we move to next work.
+          // Dont forget the break; we don't need.
           break;
         }
       }
@@ -275,6 +277,10 @@ public class TopologicalSort {
 
       //Reduce the in-degree for the neighbor nodes after adding the main node to the list.
       //But for this we need to know the neighbors for a vertex(character)
+      //Why is the below check needed? Consider example b,cz. Graph map will contain b->c and indegreeMap will contain b->0,c->1,z->0.
+      // We have added b and z both to queue as their in degree is 0. All default in degrees are 0.
+      //When we pop from queue z and try to process it, since it is not even in the graphMap we don't know what to
+      // do with it and where should it come in the sorted order. So we have to ignore such characters.
       if (graphMap.containsKey(c)) {
         for (char neighbor : graphMap.get(c)) {
           inDegreeMap.put(neighbor, inDegreeMap.get(neighbor) - 1);

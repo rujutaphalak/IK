@@ -147,7 +147,8 @@ public class ZombieCluster {
   //------------------Second way of doing it----------------------//
   public static int zombieCluster(String[] zombies) {
 
-    //Simple DFS. Great solution over second one.
+    //Simple DFS. Great solution over second one.The trick here is to have a single dimension visited array for zombie.
+    // Do not confuse it because of the zombie matrix. That is why no need to even convert this into a matrix.
     int rows = zombies.length;
     int count =0;
     int[] visited = new int[zombies.length];
