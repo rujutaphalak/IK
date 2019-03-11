@@ -243,6 +243,8 @@ public class WordLadder {
         boolean found = false;
 
         int size = wordSet.size();
+        //Methods to generate negihbors are wordLength * wordSetLength || wordLength * 26 (abc characters).
+        // Hence if wordSetLength > 26 then do char operations.
         boolean charOperation = (size > 26) ? true : false;
 
         boolean isFirst = true;
