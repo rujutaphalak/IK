@@ -27,9 +27,6 @@ public class DetectCycleAttempt2 {
     if (stack.contains(vertex))
       return true;
 
-    if (visited.contains(vertex))
-      return false;
-
     /*This condition takes care of one directional edges with no neighbors. For example 1->2,2->3.
     3 is a vertex but it is not a key in the graph. It will try to look for 3 in graph ot get its neighbors.
     It shouldn't because 3 has not outgoing edges. It shold just return false */
@@ -44,10 +41,10 @@ public class DetectCycleAttempt2 {
       Here the 2 is visited by 1. And in th dfs of 4, 2 is the neighbor. If we add the below commented condition, it will actually
       prevent us from exploring the loop*/
 
-      // if(!visited.contains(vertex)) {
-      if (hasCycleUtil(neighbor, graph, stack, visited))
-        return true;
-      //}//end if
+       if(!visited.contains(vertex)) {
+        if (hasCycleUtil(neighbor, graph, stack, visited))
+          return true;
+       }//end if
     }
     //This is to make the nodes visited after one cycle is over
     visited.add(vertex);

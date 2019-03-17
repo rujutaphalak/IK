@@ -176,17 +176,21 @@ public class WordLadder {
 //        return resultList.toArray(new String[resultList.size()]);
 //    }
 
-//No working. Attempting 4th try and making changes to see what things I would like to change. Commented part is being changed.
+//WORKING!!!! Attempting 4th try and making changes to see what things I would like to change and clean up. Commented part didn't work for me yet.
+    //Removed the code that did the isFirst check. That is not needed as we are already checking isCharDifferenceOne(word,stop).
+    //This covers all scenarios. This solution ran all test cases in IK.
     static String[] string_transformation(String[] words, String start, String stop) {
         if (start.equals(stop) && words.length < 1)
             return new String[]{"-1"};
 
+        //Create a set of words from the string array and add the start and stop
         Set<String> wordSet = new HashSet<>();
 
         wordSet.addAll(Arrays.asList(words));
         wordSet.add(start);
         wordSet.add(stop);
 
+        //BFS - to find the shortest path using wordGraph, start and stop
         String[] path = getShortestPath(wordSet, start, stop);
         return path;
     }
@@ -195,18 +199,19 @@ public class WordLadder {
         boolean charOperation) {
         List<String> neighbors = new ArrayList<>();
 
-        //Using arr instead of string concatenation using substring isn't working. Why?
         if (charOperation) {
             for (int i = 0; i < word.length(); i++) {
-                char[] arr = word.toCharArray();
+                // char[] arr = word.toCharArray();
                 for (char c = 'a'; c <= 'z'; c++) {
                     if (word.charAt(i) != c) {
-                        arr[i] = c;
-                        String str = arr.toString();
+                        // arr[i] = c;
+                        // String str = arr.toString();
+                        String str = word.substring(0,i)+ String.valueOf(c)+ word.substring(i+1);
                         if (wordSet.contains(str))
                             neighbors.add(str);
                     }
                 }
+                // arr[i] = word.charAt(i);
             }
         } else {
             for (String potentialWord : wordSet)
@@ -243,21 +248,10 @@ public class WordLadder {
         boolean found = false;
 
         int size = wordSet.size();
-        //Methods to generate negihbors are wordLength * wordSetLength || wordLength * 26 (abc characters).
-        // Hence if wordSetLength > 26 then do char operations.
         boolean charOperation = (size > 26) ? true : false;
-
-        boolean isFirst = true;
 
         while (!queue.isEmpty()) {
             String word = queue.remove();
-
-            if (!isFirst && word.equals(stop)) {
-                String parent = backRefs.get(stop);
-                //Why is the below stepo needed? Does not seem like it really does anything.
-                // backRefs.remove(word);
-                return deriveResultList(backRefs, parent, stop);
-            }
 
             if(isCharDifferenceOne(word,stop)){
                 return deriveResultList(backRefs, word, stop);
@@ -270,7 +264,6 @@ public class WordLadder {
                     queue.add(neighbor);
                 }
             }
-            isFirst = false;
         }
         return new String[] { "-1" };
     }
@@ -287,7 +280,6 @@ public class WordLadder {
         Collections.reverse(resultList);
         return resultList.toArray(new String[resultList.size()]);
     }
-
 
     //---------------Non working 1st attempt solution. Fails 2 test cases where start and stop are exactly same-----------------//
 

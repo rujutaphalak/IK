@@ -367,8 +367,51 @@ public class ShortestPathIn2DGrid {
       return startCell;
   }
 
+//  static void bfsGridExplore(Cell startCell) {
+//    // this is 0000000000 (10bits to represent a key). Every other 1 bit shift represents the letter a-j
+//    boolean visited[][][] = new boolean[charGrid.length][charGrid[0].length][1024];
+//
+//    Queue<Cell> queue = new LinkedList<>();
+//    startCell.setDist(0);
+//    startCell.setKeyRing(0);
+//    queue.add(startCell);
+//    visited[startCell.getX()][startCell.getY()][0] = true;
+//
+//    while(!queue.isEmpty()){
+//      Cell popped = queue.poll();
+//      char poppedChar = charGrid[popped.getX()][popped.getY()];
+//
+//      //This is Optimization that prevents all distant points from being tried.
+//      if(paths.size() != 0 && paths.size() <= popped.getDist()) continue;
+//      if( poppedChar == '+'){
+//        //do things to check if steep if current path is shorter than the one
+//        //return that path.
+//        if(paths.size() == 0 || paths.size() > popped.getDist())
+//          paths.clear();
+//          while (popped != null) {
+//          paths.add(new int[]{popped.getX(), popped.getY()});
+//          popped = popped.parent;
+//        }
+//        continue;
+//      }
+//
+//      for(Cell neighbor: getValidNeighbors(popped, charGrid.length, charGrid[0].length, visited)){
+//        int neighborRow = neighbor.getX();
+//        int neighborCol = neighbor.getY();
+//
+//        if(!visited[neighbor.getX()][neighbor.getY()][neighbor.getKeyRing()]){
+//          visited[neighborRow][neighborCol][neighbor.getKeyRing()] = true;
+//          queue.add(neighbor);
+//        }
+//      }
+//    }
+//  }
+
+/*
+Have eliminated some steps from the above nethod int he below method. Commented to support the step elimination.
+ */
   static void bfsGridExplore(Cell startCell) {
-    // this is 0000000000 (10bits to represent a key). Every other 1 bit shift represents the letter a-j
+    // this is 00000 00000 (10bits to represent keys). Every other 1 bit shift represents the letter a-j
     boolean visited[][][] = new boolean[charGrid.length][charGrid[0].length][1024];
 
     Queue<Cell> queue = new LinkedList<>();
@@ -381,18 +424,21 @@ public class ShortestPathIn2DGrid {
       Cell popped = queue.poll();
       char poppedChar = charGrid[popped.getX()][popped.getY()];
 
-      //This is Optimization that prevents all distant points from being tried.
+      /*This is Optimization that prevents all distant points from being tried.Even if you don't do this, it is okay*/
       if(paths.size() != 0 && paths.size() <= popped.getDist()) continue;
+
+      /*Commented green part is not needed, bfs by default always explores the shortest path so if you find target that is going to be the shortest path as long as the valid neighbors checks are done right.
+          you don't need to check if paths.size() > popped.getDist()*/
       if( poppedChar == '+'){
-        //do things to check if steep if current path is shorter than the one
-        //return that path.
-        if(paths.size() == 0 || paths.size() > popped.getDist())
-          paths.clear();
-          while (popped != null) {
+        /*do things to check if step if current path is shorter than the one in path, if continue it will keep exploring even after shortest path has been found*/
+        // if(paths.size() == 0 || paths.size() > popped.getDist())
+        //   paths.clear();
+        while (popped != null) {
           paths.add(new int[]{popped.getX(), popped.getY()});
           popped = popped.parent;
         }
-        continue;
+        return;
+        // continue;
       }
 
       for(Cell neighbor: getValidNeighbors(popped, charGrid.length, charGrid[0].length, visited)){
