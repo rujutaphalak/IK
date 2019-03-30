@@ -346,150 +346,79 @@ public class RegexMatcher {
 
     boolean isStarChar[] = new boolean[pLen];
     String simplifiedPattern = simplifyPattern(pattern, isStarChar, pLen);
-    return matcherBrute(simplifiedPattern, text, 0, 0, isStarChar);
+    return matcher(simplifiedPattern, text, 0, 0, isStarChar);
 
   }
-
-  /*
-   * Below function will remove duplicate '*' characters and '*' itself from pattern String, and will
-   * return that string.
-   * e.g. pattern = [a*a*bcd*] returns [abcd] and make true to isStarChar at position {0,3}.
-   */
-
-  public static String simplifyPattern(String pattern, boolean isStarChar[], int pLen) {
-
-    int ind = 0;
-    char simplifiedChars[] = new char[pattern.length()];
-
-    for (int i = 0; i < pLen; ) {
-
-      simplifiedChars[ind] = pattern.charAt(i);
-
-      // If i'th character is followed by '*', then mark isStartChar[i] true.
-      if (i + 1 < pLen && pattern.charAt(i + 1) == '*') {
-
-        // Below 'if' condition is to handle Duplicate character.
-        // e.g. [a*a*bc*dd*] = [a*bc*dd*] because,
-        //      you can write [a*a*] = [a*] which meaning is same.
-
-        if (ind - 1 >= 0 && isStarChar[ind - 1]
-            && simplifiedChars[ind - 1] == simplifiedChars[ind]) {
-          ind--;
-        } else {
-          isStarChar[ind] = true;
+  private static String simplifyPattern(String pattern, boolean[] isStarChar, int pLen) {
+    int len = pattern.length();
+    int index = 0,i=0;
+    char[] simplePattern = new char[len];
+    while(i<pLen) {
+      simplePattern[index] = pattern.charAt(i);
+      if(i+1<pLen && pattern.charAt(i+1)=='*'){
+        //This is to take care of duplicates like ab*b*b*c, we can just consider this as ab*c.
+        // This use case can be omitted to start with and then later take care aws this adds complexity
+        if((index-1)>=0 && pattern.charAt(index) == pattern.charAt(index-1) && isStarChar[index])
+          index--;
+        else {
+          isStarChar[index] = true;
         }
-
-        // i+1'th character is "*". So, i increases by 2.
-
-        i = i + 2;
-      } else {
+        //In any case if there is a star you should skip 2 characters - one for char and the other for *.
+        i=i+2;
+      }
+      else{
         i++;
       }
-      ind++;
+      index++;
     }
-
-    // Converting character array to string for simplicity.
-
-    return new String(simplifiedChars, 0, ind);
+    return new String(simplePattern,0,index);
   }
 
-  public static boolean matcherBrute(
-      String pattern, String text, int pInd, int tInd, boolean isStarChar[]
-  ) {
 
-    // If both the pointer reaches at the end, then it matches.
-
-    if (pInd == pattern.length() && tInd == text.length()) {
+  private static boolean matcher(String pattern, String text, int pInd, int tInd, boolean[] isStarChar){
+    //this happens when the pattern matches the text, base condition to stop the recursion.
+    if(pInd == pattern.length() && tInd == text.length())
       return true;
-    }
-
-    // If only pattern pointer reaches at the end, then there is no match.
-
-    if (pInd == pattern.length()) {
+    //e.g text abc and pattern is a.. Pattern ends first
+    if(pInd == pattern.length())
       return false;
-    }
 
-    /*  If only text pointer reaches at the end,
-     *  then there should be only star characters ("*") in pattern for match.
-     */
-
-    if (tInd == text.length()) {
-
-      while (pInd < pattern.length()) {
-        if (!isStarChar[pInd]) {
+    //e.g abc and abc*, text ends first
+    if(tInd == text.length()){
+      while(pInd < pattern.length()){
+        if(!isStarChar[pInd])
           return false;
-        }
         pInd++;
       }
-
       return true;
     }
 
-    /* When pattern character is not followed by '*',
-     *  but If it is a '.' or matches with the text character,
-     *  then increases both the pointer and check.
-     */
-
-    if (
-        !isStarChar[pInd] && (pattern.charAt(pInd) == '.'
-            || pattern.charAt(pInd) == text.charAt(tInd))
-    ) {
-
-      return matcherBrute(pattern, text, pInd + 1, tInd + 1, isStarChar);
-
+    if(!isStarChar[pInd] && (pattern.charAt(pInd)=='.' || pattern.charAt(pInd) == text.charAt(tInd))){
+     return matcher(pattern,text,pInd+1,tInd+1,isStarChar);
     }
 
-        /* If pattern character has '*', then there can be two cases,
-        *      1) It's a '.' (2 cases)
-        .* 	        a) Match with the text character
-        *           b) Ignore the '.'
-        *
-        *       2) It's an alphabet
-        *           if it matches with text character (2 cases)
-        *               a) consider the pattern character
-        *               b) ignore the pattern character
-        *           else
-        *               a) ignore the pattern character
-        */
+    if(isStarChar[pInd]){
+      //e.g if you have text abbc and you have a pattern ab.*c, the isStartChar is going to be fftf and simplepattern is going to be ab.c
+      //Here the .* can be 0 characters hence matcher(pattern, text, pInd+1, tInd, isStarChar) or 1 hence return (matcher(pattern,text,pInd,tInd+1,isStarChar)
+      if(pattern.charAt(pInd)=='.'){
+        return (matcher(pattern,text,pInd,tInd+1,isStarChar) ||
+            matcher(pattern, text, pInd+1, tInd, isStarChar));
+      }
 
-    if (isStarChar[pInd]) {
-
-      if (pattern.charAt(pInd) == '.') {
-        return matcherBrute(pattern, text, pInd, tInd + 1, isStarChar)
-            || matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
-
-      } else {
-        if (pattern.charAt(pInd) == text.charAt(tInd)) {
-          return matcherBrute(pattern, text, pInd, tInd + 1, isStarChar)
-              || matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
-
-        } else {
-          return matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
-
+      else{
+        if(pattern.charAt(pInd) == text.charAt(tInd)){
+          return matcher(pattern,text,pInd,tInd+1,isStarChar) ||
+              matcher(pattern,text,pInd+1,tInd,isStarChar);
+        }
+        else{
+          return matcher(pattern,text,pInd+1,tInd,isStarChar);
         }
       }
     }
-
-    return false;
+  return false;
   }
-    // ----------------------------- STOP -------------------------
 
-/**
- * DP solution for it
- */
 
-  // -------------------------- START ---------------------------------
-
-  public static boolean pattern_matcherDP(String text,String pattern) {
-
-    int pLen = pattern.length();
-
-    //This will store true at location i, if simplifiedPattern has "*" character at location i
-    boolean isStarChar[] = new boolean[pLen];
-    String simplifiedPattern = simplifyPatternDP(pattern, isStarChar, pLen);
-    return matcherDP(simplifiedPattern, text, isStarChar);
-
-  }
 
   /*
    * Below function will remove duplicate '*' characters and '*' itself from pattern String, and will
@@ -497,119 +426,260 @@ public class RegexMatcher {
    * e.g. pattern = [a*a*bcd*] returns [abcd] and make true to isStarChar at position {0,3}.
    */
 
-  public static String simplifyPatternDP(String pattern, boolean isStarChar[], int pLen) {
-
-    int ind = 0;
-    char simplifiedChars[] = new char[pattern.length()];
-
-    for(int i = 0 ; i < pLen ; ) {
-
-      simplifiedChars[ind] = pattern.charAt(i);
-
-      // If i'th character is followed by '*', then mark isStartChar[i] true.
-      if(i + 1 < pLen && pattern.charAt(i+1) == '*') {
-
-        /* Below 'if' condition is to handle Duplicate character.
-         * e.g. [a*a*bc*dd*] = [a*bc*dd*],
-         *      because you can write [a*a*] = [a*] which meaning is same.
-         */
-
-        if(ind - 1 >= 0 && isStarChar[ind-1] && simplifiedChars[ind-1] == simplifiedChars[ind]) {
-          ind--;
-        } else {
-          isStarChar[ind] = true;
-        }
-
-        // i+1'th character is "*". So, i increases by 2.
-
-        i = i + 2;
-      } else {
-        i++;
-      }
-      ind++;
-    }
-
-    // Converting character array to string for simplicity.
-
-    return new String(simplifiedChars , 0 , ind);
-  }
-
-  public static boolean matcherDP(String pattern, String text, boolean isStarChar[]) {
-
-    int pLen = pattern.length(), tLen = text.length();
-
-    // If both strings are null, then return true.
-
-    if(pLen == 0 && tLen == 0) {
-      return true;
-    }
-
-    // If pattern is null but text is not, then return false.
-
-    if(pLen == 0) {
-      return false;
-    }
-
-    // dp[i][j] is true, if first i characters in given string matches the first j characters of pattern.
-
-    boolean dp[][] = new boolean[tLen + 1][pLen + 1];
-    dp[0][0] = true;
-    if(isStarChar[0]) {
-      dp[0][1] = true;
-    }
-
-    // If the given text is null,
-    // then it will be true till the all the characters in simplified string have "*".
-
-    for(int pInd = 1 ; pInd < pLen ; pInd++) {
-
-      if(dp[0][pInd] && isStarChar[pInd]) {
-        dp[0][pInd+1] = true;
-        continue;
-      }
-
-      break;
-    }
-
-    for(int tInd = 0 ; tInd < tLen ; tInd++) {
-
-      for(int pInd = 0 ; pInd < pLen ; pInd++) {
-
-        /* Note : First i character of text string means substring of text string
-         *        with [0,i-1] positions.
-         *        same for pattern string.
-         */
-
-        // Case 1, explained in editorial
-
-        if(dp[tInd + 1][pInd] && isStarChar[pInd]) {
-          dp[tInd + 1][pInd + 1] = true;
-          continue;
-        }
-
-        // Case 2, explained in editorial
-
-        if(
-            dp[tInd][pInd]
-                && (pattern.charAt(pInd) == '.' || pattern.charAt(pInd) == text.charAt(tInd))
-        ) {
-          dp[tInd + 1][pInd + 1] = true;
-          continue;
-        }
-
-        // Case 3, explained in editorial
-
-        if(dp[tInd][pInd + 1] && isStarChar[pInd] &&
-            (pattern.charAt(pInd) == '.' || pattern.charAt(pInd) == text.charAt(tInd))) {
-          dp[tInd + 1][pInd + 1] = true;
-          continue;
-        }
-      }
-    }
-
-    return dp[tLen][pLen];
-
-  }
+//  public static String simplifyPattern(String pattern, boolean isStarChar[], int pLen) {
+//
+//    int ind = 0;
+//    char simplifiedChars[] = new char[pattern.length()];
+//
+//    for (int i = 0; i < pLen; ) {
+//
+//      simplifiedChars[ind] = pattern.charAt(i);
+//
+//      // If i'th character is followed by '*', then mark isStartChar[i] true.
+//      if (i + 1 < pLen && pattern.charAt(i + 1) == '*') {
+//
+//        // Below 'if' condition is to handle Duplicate character.
+//        // e.g. [a*a*bc*dd*] = [a*bc*dd*] because,
+//        //      you can write [a*a*] = [a*] which meaning is same.
+//
+//        if (ind - 1 >= 0 && isStarChar[ind - 1]
+//            && simplifiedChars[ind - 1] == simplifiedChars[ind]) {
+//          ind--;
+//        } else {
+//          isStarChar[ind] = true;
+//        }
+//
+//        // i+1'th character is "*". So, i increases by 2.
+//
+//        i = i + 2;
+//      } else {
+//        i++;
+//      }
+//      ind++;
+//    }
+//
+//    // Converting character array to string for simplicity.
+//
+//    return new String(simplifiedChars, 0, ind);
+//  }
+//
+//  public static boolean matcherBrute(
+//      String pattern, String text, int pInd, int tInd, boolean isStarChar[]
+//  ) {
+//
+//    // If both the pointer reaches at the end, then it matches.
+//
+//    if (pInd == pattern.length() && tInd == text.length()) {
+//      return true;
+//    }
+//
+//    // If only pattern pointer reaches at the end, then there is no match.
+//
+//    if (pInd == pattern.length()) {
+//      return false;
+//    }
+//
+//    /*  If only text pointer reaches at the end,
+//     *  then there should be only star characters ("*") in pattern for match.
+//     */
+//
+//    if (tInd == text.length()) {
+//
+//      while (pInd < pattern.length()) {
+//        if (!isStarChar[pInd]) {
+//          return false;
+//        }
+//        pInd++;
+//      }
+//
+//      return true;
+//    }
+//
+//    /* When pattern character is not followed by '*',
+//     *  but If it is a '.' or matches with the text character,
+//     *  then increases both the pointer and check.
+//     */
+//
+//    if (
+//        !isStarChar[pInd] && (pattern.charAt(pInd) == '.'
+//            || pattern.charAt(pInd) == text.charAt(tInd))
+//    ) {
+//
+//      return matcherBrute(pattern, text, pInd + 1, tInd + 1, isStarChar);
+//
+//    }
+//
+//        /* If pattern character has '*', then there can be two cases,
+//        *      1) It's a '.' (2 cases)
+//        .* 	        a) Match with the text character
+//        *           b) Ignore the '.'
+//        *
+//        *       2) It's an alphabet
+//        *           if it matches with text character (2 cases)
+//        *               a) consider the pattern character
+//        *               b) ignore the pattern character
+//        *           else
+//        *               a) ignore the pattern character
+//        */
+//
+//    if (isStarChar[pInd]) {
+//
+//      if (pattern.charAt(pInd) == '.') {
+//        return matcherBrute(pattern, text, pInd, tInd + 1, isStarChar)
+//            || matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
+//
+//      } else {
+//        if (pattern.charAt(pInd) == text.charAt(tInd)) {
+//          return matcherBrute(pattern, text, pInd, tInd + 1, isStarChar)
+//              || matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
+//
+//        } else {
+//          return matcherBrute(pattern, text, pInd + 1, tInd, isStarChar);
+//
+//        }
+//      }
+//    }
+//
+//    return false;
+//  }
+//    // ----------------------------- STOP -------------------------
+//
+///**
+// * DP solution for it
+// */
+//
+//  // -------------------------- START ---------------------------------
+//
+//  public static boolean pattern_matcherDP(String text,String pattern) {
+//
+//    int pLen = pattern.length();
+//
+//    //This will store true at location i, if simplifiedPattern has "*" character at location i
+//    boolean isStarChar[] = new boolean[pLen];
+//    String simplifiedPattern = simplifyPatternDP(pattern, isStarChar, pLen);
+//    return matcherDP(simplifiedPattern, text, isStarChar);
+//
+//  }
+//
+//  /*
+//   * Below function will remove duplicate '*' characters and '*' itself from pattern String, and will
+//   * return that string.
+//   * e.g. pattern = [a*a*bcd*] returns [abcd] and make true to isStarChar at position {0,3}.
+//   */
+//
+//  public static String simplifyPatternDP(String pattern, boolean isStarChar[], int pLen) {
+//
+//    int ind = 0;
+//    char simplifiedChars[] = new char[pattern.length()];
+//
+//    for(int i = 0 ; i < pLen ; ) {
+//
+//      simplifiedChars[ind] = pattern.charAt(i);
+//
+//      // If i'th character is followed by '*', then mark isStartChar[i] true.
+//      if(i + 1 < pLen && pattern.charAt(i+1) == '*') {
+//
+//        /* Below 'if' condition is to handle Duplicate character.
+//         * e.g. [a*a*bc*dd*] = [a*bc*dd*],
+//         *      because you can write [a*a*] = [a*] which meaning is same.
+//         */
+//
+//        if(ind - 1 >= 0 && isStarChar[ind-1] && simplifiedChars[ind-1] == simplifiedChars[ind]) {
+//          ind--;
+//        } else {
+//          isStarChar[ind] = true;
+//        }
+//
+//        // i+1'th character is "*". So, i increases by 2.
+//
+//        i = i + 2;
+//      } else {
+//        i++;
+//      }
+//      ind++;
+//    }
+//
+//    // Converting character array to string for simplicity.
+//
+//    return new String(simplifiedChars , 0 , ind);
+//  }
+//
+//  public static boolean matcherDP(String pattern, String text, boolean isStarChar[]) {
+//
+//    int pLen = pattern.length(), tLen = text.length();
+//
+//    // If both strings are null, then return true.
+//
+//    if(pLen == 0 && tLen == 0) {
+//      return true;
+//    }
+//
+//    // If pattern is null but text is not, then return false.
+//
+//    if(pLen == 0) {
+//      return false;
+//    }
+//
+//    // dp[i][j] is true, if first i characters in given string matches the first j characters of pattern.
+//
+//    boolean dp[][] = new boolean[tLen + 1][pLen + 1];
+//    dp[0][0] = true;
+//    if(isStarChar[0]) {
+//      dp[0][1] = true;
+//    }
+//
+//    // If the given text is null,
+//    // then it will be true till the all the characters in simplified string have "*".
+//
+//    for(int pInd = 1 ; pInd < pLen ; pInd++) {
+//
+//      if(dp[0][pInd] && isStarChar[pInd]) {
+//        dp[0][pInd+1] = true;
+//        continue;
+//      }
+//
+//      break;
+//    }
+//
+//    for(int tInd = 0 ; tInd < tLen ; tInd++) {
+//
+//      for(int pInd = 0 ; pInd < pLen ; pInd++) {
+//
+//        /* Note : First i character of text string means substring of text string
+//         *        with [0,i-1] positions.
+//         *        same for pattern string.
+//         */
+//
+//        // Case 1, explained in editorial
+//
+//        if(dp[tInd + 1][pInd] && isStarChar[pInd]) {
+//          dp[tInd + 1][pInd + 1] = true;
+//          continue;
+//        }
+//
+//        // Case 2, explained in editorial
+//
+//        if(
+//            dp[tInd][pInd]
+//                && (pattern.charAt(pInd) == '.' || pattern.charAt(pInd) == text.charAt(tInd))
+//        ) {
+//          dp[tInd + 1][pInd + 1] = true;
+//          continue;
+//        }
+//
+//        // Case 3, explained in editorial
+//
+//        if(dp[tInd][pInd + 1] && isStarChar[pInd] &&
+//            (pattern.charAt(pInd) == '.' || pattern.charAt(pInd) == text.charAt(tInd))) {
+//          dp[tInd + 1][pInd + 1] = true;
+//          continue;
+//        }
+//      }
+//    }
+//
+//    return dp[tLen][pLen];
+//
+//  }
 
   // ------------------------------ STOP ----------------------------
 }

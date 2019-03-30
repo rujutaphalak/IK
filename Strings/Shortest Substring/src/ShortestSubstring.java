@@ -7,10 +7,10 @@ import java.util.Map;
 public class ShortestSubstring {
 
     public static void main(String[] args) {
-//        String s = "helloworld";
-        String s = "AYZABOBECODXBANC";
-//        String pattern = "lrw";
-        String pattern = "ABC";
+        String s = "helloworld";
+//        String s = "t";
+        String pattern = "llrw";
+//        String pattern = "t";
         String result = shortestSubstring(s, pattern);
         System.out.println(result);
     }
@@ -23,7 +23,7 @@ public class ShortestSubstring {
     public static String shortestSubstring(String s, String pattern) {
 
         if (pattern.length() > s.length())
-            return "";
+            return "-1";
         return minimum_window(s, pattern);
     }
 
@@ -106,58 +106,57 @@ public class ShortestSubstring {
 
 
     public static String minimum_window(String s, String t) {
-    int tLength = t.length();
-    int sLength = s.length();
-        if(sLength < tLength)
+      int tLength = t.length();
+      int sLength = s.length();
+      if(sLength < tLength)
         return "-1";
 
-    String result = "-1";
-    Map<Character,Integer> tMap = new HashMap<>();
-    Map<Character,Integer> sMap = new HashMap<>();
+      String result = "-1";
+      Map<Character,Integer> tMap = new HashMap<>();
+      Map<Character,Integer> sMap = new HashMap<>();
 
-    //Initialize the map with the characters in t we want to find
-        for(int i=0;i<tLength;i++){
+      //Initialize the map with the characters in t we want to find
+      for(int i=0;i<tLength;i++){
         char tChar = t.charAt(i);
+        sMap.put(tChar,0);
+
         if(!tMap.containsKey(tChar))
-            tMap.put(tChar,1);
+          tMap.put(tChar,1);
         else
-            tMap.put(tChar,tMap.get(tChar)+1);
-    }
+          tMap.put(tChar,tMap.get(tChar)+1);
+      }
 
-    int start=0;
-    int minLength = s.length()+1;
-    int count=0;
+      int start=0;
+      int minLength = s.length()+1;
+      int count=0;
 
-        for(int end=0;end<sLength;end++) {
+      for(int end=0;end<sLength;end++) {
         char eChar = s.charAt(end);
-        if(!sMap.containsKey(eChar))
-            sMap.put(eChar, 1);
-        else
-            sMap.put(eChar, sMap.get(eChar)+1);
 
-        if (tMap.containsKey(eChar) && sMap.get(eChar) <= tMap.get(eChar))
+        if(sMap.containsKey(eChar)) {
+          sMap.put(eChar, sMap.get(eChar)+1);
+
+          if (tMap.containsKey(eChar) && sMap.get(eChar) <= tMap.get(eChar))
             count++;
+        }
 
         //if count is reached the size of t, shrink the window by moving the left/start pointer
         if(count == tLength){
-            while(start<end){
-                if(tMap.containsKey(s.charAt(start)) && sMap.get(s.charAt(start)) > tMap.get(s.charAt(start))) {
-                    sMap.put(s.charAt(start), sMap.get(s.charAt(start))-1);
-                }
-                start++;
-            }
+          while(!tMap.containsKey(s.charAt(start)) || sMap.get(s.charAt(start)) > tMap.get(s.charAt(start))) {
+            if(sMap.containsKey(s.charAt(start)))
+              sMap.put(s.charAt(start), sMap.get(s.charAt(start))-1);
+            start++;
+          }
 
-
-            int length = end-start+1;
-            if(length < minLength){
-                minLength = length;
-                result = s.substring(start,end+1);
-            }
+          int length = end-start+1;
+          if(length < minLength){
+            minLength = length;
+            result = s.substring(start,end+1);
+          }
         }
-    }//end for
-    return result;
-}
-
+      }//end for
+      return result;
+    }
 }
 
 

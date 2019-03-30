@@ -153,6 +153,7 @@ public class SinusoidalString {
 
     for(int k=0;k<grid.length;k++){
       for(int l=0;l<grid[0].length;l++) {
+        //empty characters in the char grid are not ' ' but are representing with char 0. Didn't know that.
         if(grid[k][l] == 0)
           System.out.print(" ");
         else

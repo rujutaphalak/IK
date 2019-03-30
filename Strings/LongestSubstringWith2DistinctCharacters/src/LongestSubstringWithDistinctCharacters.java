@@ -73,7 +73,7 @@ import java.util.Set;
 public class LongestSubstringWithDistinctCharacters {
 
     public static void main(String[] args) {
-        String s = "aaaabbbccc";
+        String s = "ababababa";
         int result = getLongestSubstringLengthExactly2DistinctChars(s);
         System.out.println(result);
     }
@@ -82,80 +82,31 @@ public class LongestSubstringWithDistinctCharacters {
         return getLongestStringDistinctChar(s);
     }
 
-    private static int getLongestStringDistinctChar(String s){
-        if (s.length() < 2)
-            return 0;
-
-        Set<Character> map = new HashSet<>();
-        int maxLength=0, start=0,end;
-
-        while(start<s.length()) {
-            map.clear();
-
-            for (end=start;end < s.length();end++) {
-                if (!map.contains(s.charAt(end))){
-                    if (map.size() == 2) {
-                        break;
-                    }
-                    else
-                        map.add(s.charAt(end));
-                }
-            }
-            if(map.size()==2) {
-                end--;
-                if ((end - start + 1) > maxLength)
-                    maxLength = end - start + 1;
-            }
-
-            if(end!=s.length()) {
-                while (end >= 1) {
-                    if (s.charAt(end - 1) == s.charAt(end))
-                        end--;
-                    else
-                        break;
-                }
-            }
-            start=end;
-        }
-        return maxLength;
-    }
-
-    /*
-    Implemented using hashmap, but we really dont need the count of characters, we just
-    need ot keep the count of dictinct characters for which set is enough.
-     */
 //    private static int getLongestStringDistinctChar(String s){
 //        if (s.length() < 2)
 //            return 0;
 //
-//        Map<Character, Integer> map = new HashMap<>();
+//        Set<Character> map = new HashSet<>();
 //        int maxLength=0, start=0,end;
 //
 //        while(start<s.length()) {
 //            map.clear();
-//            boolean done = false;
 //
 //            for (end=start;end < s.length();end++) {
-//                if (!map.containsKey(s.charAt(end))){
+//                if (!map.contains(s.charAt(end))){
 //                    if (map.size() == 2) {
 //                        break;
 //                    }
 //                    else
-//                        map.put(s.charAt(end), 1);
-//                }
-//                else{
-//                    map.put(s.charAt(end), map.get(s.charAt(end))+1);
+//                        map.add(s.charAt(end));
 //                }
 //            }
 //            if(map.size()==2) {
-//                done = true;
 //                end--;
-//            }
-//            if(done) {
-//                if ((end - start + 1) > maxLength) {
+//                if ((end - start + 1) > maxLength)
 //                    maxLength = end - start + 1;
-//                }
 //            }
+//
 //            if(end!=s.length()) {
 //                while (end >= 1) {
 //                    if (s.charAt(end - 1) == s.charAt(end))
@@ -168,4 +119,47 @@ public class LongestSubstringWithDistinctCharacters {
 //        }
 //        return maxLength;
 //    }
+
+
+    static int getLongestStringDistinctChar(String s){
+        Set<Character> set = new HashSet<>();
+        int sLen = s.length();
+        int maxLength = 0, start =0,end=0;
+
+        while(start<=end){
+            start=end;
+            set.clear();
+            while(end < sLen){
+                if(!set.contains(s.charAt(end))){
+                    if(set.size() == 2){
+                        end=end-1;
+                        int length = end-start+1;
+                        if(maxLength < length){
+                            maxLength = length;
+                        }
+                        break;
+                    }
+                    else if (set.size() < 2)
+                        set.add(s.charAt(end));
+                }
+                end++;
+            }//end inner while loop
+
+            if(end == sLen && set.size()==2){
+                end--;
+                int length = end-start+1;
+                if(maxLength < length){
+                    maxLength = length;
+                }
+                break;
+            }
+
+            //adjust end to move back to repeated character like aaaabbbcccc
+            while(end>0 && s.charAt(end-1) == s.charAt(end))
+                end--;
+
+        }//outer while loop
+
+        return maxLength;
+    }
 }
